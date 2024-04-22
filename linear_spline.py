@@ -6,8 +6,6 @@ from utils import (
 )
 from interpol_error import epsilon
 
-import math as m
-
 
 def lin_spline_polynomial(X, Y, h, x) -> float:
     i = find_sub_interval(X, x)

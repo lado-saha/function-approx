@@ -1,8 +1,4 @@
-from operator import lshift
 import matplotlib.pyplot as plt
-import multiprocessing
-import os
-import subprocess
 
 PLOT_POINTS_COUNT = 1000
 
@@ -109,36 +105,3 @@ def integral_simpson(x_coords: list[float], y_coords: list[float]) -> float:
         integral += coeff * y_coords[i]
 
     return integral * h / 3
-
-
-def call_functions_parallel(functions):
-    """
-    Execute a list of functions in parallel in separate terminals.
-
-    Args:
-        functions (list): A list of functions to be executed.
-
-    Returns:
-        None
-    """
-    # Create a directory to store temporary scripts
-    os.makedirs("./temp_scripts", exist_ok=True)
-
-    # Write each function to a separate script file
-    script_paths = []
-    for i, func in enumerate(functions):
-        script_path = f"temp_scripts/script_{i}.py"
-        script_paths.append(script_path)
-        with open(script_path, "w") as f:
-            f.write("import matplotlib.pyplot as plt\n")
-            f.write(func.__code__)
-            f.write("\nplt.show()\n")
-
-    # Open a new terminal for each script
-    for script_path in script_paths:
-        terminal_command = f"python {script_path} &"
-        subprocess.Popen(["gnome-terminal", "--", "bash", "-c", terminal_command])
-
-    # Remove temporary script files (not waiting for them to finish)
-    for script_path in script_paths:
-        os.remove(script_path)

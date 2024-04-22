@@ -1,6 +1,8 @@
 from operator import lshift
 import matplotlib.pyplot as plt
 import multiprocessing
+import os
+import subprocess
 
 PLOT_POINTS_COUNT = 1000
 
@@ -111,7 +113,7 @@ def integral_simpson(x_coords: list[float], y_coords: list[float]) -> float:
 
 def call_functions_parallel(functions):
     """
-    Execute a list of functions in parallel using multiprocessing.
+    Execute a list of functions in parallel in separate terminals.
 
     Args:
         functions (list): A list of functions to be executed.
@@ -119,18 +121,24 @@ def call_functions_parallel(functions):
     Returns:
         None
     """
-    processes = []
+    # Create a directory to store temporary scripts
+    os.makedirs("./temp_scripts", exist_ok=True)
 
-    # Define a helper function to execute each function
-    def execute_function(func):
-        func()
+    # Write each function to a separate script file
+    script_paths = []
+    for i, func in enumerate(functions):
+        script_path = f"temp_scripts/script_{i}.py"
+        script_paths.append(script_path)
+        with open(script_path, "w") as f:
+            f.write("import matplotlib.pyplot as plt\n")
+            f.write(func.__code__)
+            f.write("\nplt.show()\n")
 
-    # Create and start a process for each function
-    for func in functions:
-        process = multiprocessing.Process(target=execute_function, args=(func,))
-        processes.append(process)
-        process.start()
+    # Open a new terminal for each script
+    for script_path in script_paths:
+        terminal_command = f"python {script_path} &"
+        subprocess.Popen(["gnome-terminal", "--", "bash", "-c", terminal_command])
 
-    # Wait for all processes to finish
-    # for process in processes:
-    # process.join()
+    # Remove temporary script files (not waiting for them to finish)
+    for script_path in script_paths:
+        os.remove(script_path)

@@ -5,11 +5,12 @@ import math as m
 
 
 def f1(x):
-    return 1 / (1 + m.exp(x**2)) + m.cosh(x)
+    return 2 + 4 * m.sin(x)
 
 
 a = -20
 b = 20
-n = 100
+n = 10
 
-call_functions_parallel([linear_spline_f(f1, a, b, n), cubic_spline_f(f1, a, b, n)])
+linear_spline_f(f1, a, b, n)
+cubic_spline_f(f1, a, b, n)
